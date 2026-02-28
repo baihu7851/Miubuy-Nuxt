@@ -56,25 +56,34 @@ export const useAuth = () => {
 
   /**
    * 登入
+   * ☆ API endpoint：/api/Login（非 /api/Users/Login）
+   * ☆ Content-Type 需為 application/x-www-form-urlencoded（與 Vue2 一致）
+   * ☆ 回傳格式：{ token: string（小寫）, Id: number }
    * @param payload 帳號密碼
    */
   const login = async (payload: LoginPayload): Promise<void> => {
-    const res = await $fetch<{ Token: string, Id: number }>(
-      `${config.public.apiBase}/api/Users/Login`,
+    // ☆ 使用 URLSearchParams 送出 form-encoded 格式
+    const body = new URLSearchParams()
+    body.append('Account', payload.Account)
+    body.append('Password', payload.Password)
+
+    const res = await $fetch<{ token: string, Id: number }>(
+      `${config.public.apiBase}/api/Login`,
       {
         method: 'POST',
-        body: payload,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
       },
     )
 
     // 儲存 token 到 cookie（7天）
     const tokenCookie = useCookie('userToken', { maxAge: 60 * 60 * 24 * 7 })
-    tokenCookie.value = res.Token
+    tokenCookie.value = res.token
 
     // 儲存 userId 到 localStorage
     localStorage.setItem('ID', String(res.Id))
 
-    token.value = res.Token
+    token.value = res.token
     userId.value = res.Id
 
     await fetchUserInfo()

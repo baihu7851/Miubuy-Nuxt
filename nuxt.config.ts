@@ -25,6 +25,7 @@ export default defineNuxtConfig({
         scss: {
           // 自動注入色彩變數，所有 <style lang="scss"> 可直接使用
           additionalData: '@use "~/assets/scss/variables" as *;',
+          silenceDeprecations: ['color-functions', 'global-builtin', 'import'], // 關閉 SCSS 相關警告
         },
       },
     },
@@ -34,11 +35,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       /** REST API 基礎網址，例如 https://miubuy.rocket-coding.com */
-      apiBase:    process.env.NUXT_PUBLIC_API_BASE    ?? 'https://miubuy.rocket-coding.com',
+      apiBase: process.env.NUXT_PUBLIC_API_BASE ?? 'https://miubuy.rocket-coding.com',
       /** SignalR Hub 完整 URL，例如 https://miubuy.rocket-coding.com/signalr */
       signalrHub: process.env.NUXT_PUBLIC_SIGNALR_HUB ?? 'https://miubuy.rocket-coding.com/signalr',
       /** 圖片上傳 API URL */
-      uploadUrl:  process.env.NUXT_PUBLIC_UPLOAD_URL  ?? 'https://miubuy.rocket-coding.com/api/UpLoadFile',
+      uploadUrl: process.env.NUXT_PUBLIC_UPLOAD_URL ?? 'https://miubuy.rocket-coding.com/api/UpLoadFile',
     },
   },
 

@@ -4,12 +4,12 @@
 
 /** 使用者基本資訊 */
 export interface UserInfo {
-  id: number
+  Id: number
   account: string
-  nickname: string
+  Nickname: string
   email: string
   phone: string
-  picture: string | null
+  Picture: string | null
 }
 
 /** 登入請求 */

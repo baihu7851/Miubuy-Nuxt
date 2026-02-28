@@ -6,17 +6,17 @@
 
 /** 控制新增房間 Modal 的顯示狀態（傳遞給父層） */
 const emit = defineEmits<{
-  openCreateRoom: []
-}>()
+  openCreateRoom: [];
+}>();
 
-const { isLoggedIn, userInfo, logout } = useAuth()
-const router = useRouter()
+const { isLoggedIn, userInfo, logout } = useAuth();
+const router = useRouter();
 
 /** 登出並跳轉至首頁 */
 const handleLogout = (): void => {
-  logout()
-  router.push('/')
-}
+  logout();
+  router.push('/');
+};
 </script>
 
 <template>
@@ -38,11 +38,11 @@ const handleLogout = (): void => {
         <li class="login">
           <NuxtLink to="/mypage/info" class="myname">
             <img
-              :src="userInfo?.picture ?? '/image/default-avatar.png'"
+              :src="userInfo?.Picture ?? '/image/default-avatar.png'"
               class="header-photo"
               alt="頭像"
             />
-            {{ userInfo?.nickname }}
+            {{ userInfo?.Nickname }}
           </NuxtLink>
         </li>
         <li class="login" @click="handleLogout">
@@ -64,21 +64,31 @@ const handleLogout = (): void => {
 </template>
 
 <style lang="scss" scoped>
+//☆…☆…☆…☆…☆…☆…☆…☆…☆…☆ STYLE ☆…☆…☆…☆…☆…☆…☆…☆…☆…☆
 .all-header {
   position: relative;
   max-width: 100%;
+  // ☆ min-height 確保貓掌圖有足夠空間顯示，不被 navbar 壓縮
+  min-height: 55px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px;
+  // ☆ 允許貓掌圖溢出 header 範圍
+  overflow: visible;
 
   .sell-btn {
+    width: auto;
+    height: auto;
+
     .cats-hand {
       width: 110px;
       position: absolute;
       top: 0;
       cursor: pointer;
       left: 3%;
+      // ☆ 必須高於內容層，否則會被 home-container 背景色蓋住
+      z-index: 20;
 
       &:hover {
         transform: translateX(2px);
@@ -93,7 +103,8 @@ const handleLogout = (): void => {
 
     li {
       margin-left: 20px;
-      padding: 0 5px;
+      padding-left: 5px;
+      padding-right: 5px;
       border-radius: 5px;
       font-size: 26px;
 
@@ -113,6 +124,11 @@ const handleLogout = (): void => {
       align-items: center;
     }
   }
+}
+
+//☆=========== 登出 padding ===========☆
+.logout {
+  padding: 9px;
 }
 
 .header-photo {
