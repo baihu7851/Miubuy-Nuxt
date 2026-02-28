@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import type { Country, County, City, RoomTag } from '~/types';
 
-// =============================================
-// CreateRoomModal — 新增代購房間 Modal
-// 透過 v-model:visible 控制顯示 / 隱藏
-// 取代原本依賴 jQuery CSS class 切換的做法
-// =============================================
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
+// CreateRoomModal — 新增代購房間 Modal ★
+// v-model:visible で表示 / 非表示を制御
+// jQuery の class 切換えから脱却！(´ω｀)
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
 
 const props = defineProps<{
   /** 控制 Modal 是否顯示 */
@@ -23,7 +23,7 @@ const { token } = useAuth();
 const { uploadImage, isUploading } = useUpload();
 const router = useRouter();
 
-// ── 表單資料 ─────────────────────────────────
+//☆=========== 表單資料 ===========☆
 const roomInfo = reactive({
   MaxUsers: 1,
   Name: '',
@@ -36,13 +36,13 @@ const roomInfo = reactive({
   R18: false,
 });
 
-// ── 地區選單資料 ──────────────────────────────
+//☆=========== 地區選單資料 ===========☆
 const countries = ref<Country[]>([]);
 const counties = ref<County[]>([]);
 const cities = ref<City[]>([]);
 const tags = ref<RoomTag[]>([]);
 
-// ── 圖片上傳 ─────────────────────────────────
+//☆=========== 圖片上傳 ===========☆
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
 /** 觸發隱藏的 file input */
@@ -62,7 +62,7 @@ const handleFileChange = async (event: Event): Promise<void> => {
   }
 };
 
-// ── 串聯選單 ─────────────────────────────────
+//☆=========== 串聯選單 ===========☆
 /** 選擇國家後載入縣市 */
 const onCountryChange = async (): Promise<void> => {
   if (!roomInfo.CountryId) return;
@@ -91,7 +91,7 @@ const onCountyChange = async (): Promise<void> => {
   }
 };
 
-// ── 提交 ─────────────────────────────────────
+//☆=========== 提交 ===========☆
 const isSubmitting = ref(false);
 
 /** 送出建立房間請求 */
@@ -133,7 +133,7 @@ const closeModal = (): void => {
   emit('update:visible', false);
 };
 
-// ── 初始化資料 ────────────────────────────────
+//☆=========== 初始化資料 ===========☆
 onMounted(async () => {
   try {
     const [countryRes, tagRes] = await Promise.all([
@@ -149,11 +149,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- 新增房間 Modal：透過 visible prop 控制顯示 -->
+  <!--☆.｡.:*・ﾟ 新增代購房間 Modal ☆.｡.:*・ﾟ-->
   <Teleport to="body">
     <div class="modale" :class="{ opened: visible }" aria-hidden="true">
       <div class="modal-dialog">
-        <!-- Modal Header -->
+        <!--☆=== Modal Header ===☆-->
         <div class="modal-header">
           <img src="/image/deco_cat-ribon.png" alt="" class="ribon001" />
           <h2 class="creatroom-title">
@@ -163,16 +163,16 @@ onMounted(async () => {
           </h2>
         </div>
 
-        <!-- Modal Body -->
+        <!--☆=== Modal Body ===☆-->
         <div class="modal-body">
           <div class="modal-body-l">
-            <!-- 房名 -->
+            <!--☆ 房名 ☆-->
             <div class="room-name-group group-flex mb">
               <label>房名</label>
               <input v-model="roomInfo.Name" type="text" class="room-name" />
             </div>
 
-            <!-- 招牌圖片 -->
+            <!--☆ 招牌圖片 ☆-->
             <div class="room-photo-group group-flex mb">
               <label>招牌圖片</label>
               <div class="room-img-wrapper" @click="triggerFileInput">
@@ -195,7 +195,7 @@ onMounted(async () => {
               />
             </div>
 
-            <!-- 所在地區（三層串聯） -->
+            <!--☆ 所在地區（三層串聯）☆-->
             <div class="room-location-group group-flex mb">
               <label>所在地區</label>
               <div class="location-selects">
@@ -232,7 +232,7 @@ onMounted(async () => {
               </div>
             </div>
 
-            <!-- 代購種類 -->
+            <!--☆ 代購種類 ☆-->
             <div class="category-group group-flex mb">
               <label>代購種類</label>
               <select v-model="roomInfo.TagId">
@@ -243,7 +243,7 @@ onMounted(async () => {
               </select>
             </div>
 
-            <!-- 最大人數 -->
+            <!--☆ 最大人數 ☆-->
             <div class="max-member group-flex mb">
               <label>最大人數</label>
               <select v-model="roomInfo.MaxUsers">
@@ -266,14 +266,14 @@ onMounted(async () => {
             </ul>
           </div>
 
-          <!-- 房間規約 -->
+          <!--☆=== 房間規約 ===☆-->
           <div class="modal-body-r">
             <label class="rule-title">房間規約</label>
             <textarea v-model="roomInfo.Rule" cols="30" rows="10" />
           </div>
         </div>
 
-        <!-- Modal Footer -->
+        <!--☆=== Modal Footer ===☆-->
         <div class="modal-footer group-flex">
           <button class="btn-action" @click="closeModal">取消</button>
           <button
@@ -290,7 +290,7 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
-// ── Modal 遮罩 ────────────────────────────────
+//☆=========== Modal 遮罩 ===========☆
 .modale::before {
   content: '';
   display: none;
@@ -309,7 +309,7 @@ onMounted(async () => {
   top: 15%;
 }
 
-// ── Modal 對話框 ──────────────────────────────
+//☆=========== Modal 對話框 ===========☆
 .modal-dialog {
   background: $color-header;
   border: #4e4b4b solid 2px;
@@ -326,7 +326,7 @@ onMounted(async () => {
   overflow: initial;
 }
 
-// ── Header ────────────────────────────────────
+//☆=========== Header ===========☆
 .modal-header {
   position: relative;
 }
@@ -353,7 +353,7 @@ onMounted(async () => {
   }
 }
 
-// ── Body ──────────────────────────────────────
+//☆=========== Body ===========☆
 .modal-body {
   display: flex;
   justify-content: center;
@@ -425,7 +425,7 @@ onMounted(async () => {
   margin-bottom: 14px;
 }
 
-// ── 圖片上傳 ─────────────────────────────────
+//☆=========== 圖片上傳 ===========☆
 .room-img-wrapper {
   cursor: pointer;
 }
@@ -464,7 +464,7 @@ onMounted(async () => {
   display: none;
 }
 
-// ── R18 ───────────────────────────────────────
+//☆=========== R18 ===========☆
 .r18-request {
   display: flex;
   align-items: center;
@@ -477,7 +477,7 @@ onMounted(async () => {
   }
 }
 
-// ── Footer ────────────────────────────────────
+//☆=========== Footer ===========☆
 .modal-footer {
   margin: 10px 10px 10px 0;
   display: flex;

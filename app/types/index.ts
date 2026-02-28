@@ -1,7 +1,8 @@
-// =============================================
-// 全域型別定義
-// =============================================
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
+// 全域型別定義 — 整個專案共用的 interface ★
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
 
+//☆=========== 使用者 ===========☆
 /** 使用者基本資訊 */
 export interface UserInfo {
   Id: number
@@ -12,6 +13,7 @@ export interface UserInfo {
   Picture: string | null
 }
 
+//☆=========== 認證 ===========☆
 /** 登入請求 */
 export interface LoginPayload {
   Account: string
@@ -26,6 +28,7 @@ export interface SignupPayload {
   Photo: string
 }
 
+//☆=========== API ===========☆
 /** API 通用回傳格式 */
 export interface ApiResponse<T = unknown> {
   data: T
@@ -33,6 +36,7 @@ export interface ApiResponse<T = unknown> {
   success?: boolean
 }
 
+//☆=========== 地區 ===========☆
 /** 國家 / 地區 */
 export interface Country {
   Id: number
@@ -51,6 +55,7 @@ export interface City {
   CountyId: number
 }
 
+//☆=========== 聊天室 ===========☆
 /** 聊天室標籤 */
 export interface RoomTag {
   Id: number
@@ -76,6 +81,7 @@ export interface RoomInfo {
   OnlineCount: number
 }
 
+//☆=========== 訂單 ===========☆
 /** 訂單明細項目 */
 export interface OrderItem {
   Id: number
@@ -94,6 +100,7 @@ export interface CheckoutPersonal {
   Deliver: number
 }
 
+//☆=========== 評價 ===========☆
 /** 評價 */
 export interface Review {
   Id: number

@@ -1,11 +1,11 @@
-// =============================================
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
 // auth middleware
-// 套用方式：在頁面的 definePageMeta 加上 middleware: 'auth'
-// =============================================
+// 使用方式：definePageMeta({ middleware: 'auth' })
+// 未登入的話就乖乖去登入頁 (´・ω・｀)
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
 
 export default defineNuxtRouteMiddleware(() => {
-  // SSR 關閉，直接在 client 端檢查
-  if (import.meta.server) return
+  if (import.meta.server) return  // ☆ SSR 關閉，只在 client 端跑
 
   const { isLoggedIn } = useAuth()
 

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-// =============================================
-// AppHeader — 全站頁首
-// 顯示導覽列、登入/登出狀態、使用者頭像
-// =============================================
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
+// AppHeader — 全站頁首 ★
+// 導覽列・登入狀態・頭像・貓掌按鈕 全在這裡 (´ω｀)
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
 
-/** 控制新增房間 Modal 的顯示狀態（傳遞給父層） */
+// ☆ 貓掌按鈕點了以後 emit 給 default layout
 const emit = defineEmits<{
   openCreateRoom: [];
 }>();
@@ -12,7 +12,7 @@ const emit = defineEmits<{
 const { isLoggedIn, userInfo, logout } = useAuth();
 const router = useRouter();
 
-/** 登出並跳轉至首頁 */
+/** ☆ 登出並跳轉至首頁 (´・ω・｀) */
 const handleLogout = (): void => {
   logout();
   router.push('/');
@@ -21,7 +21,7 @@ const handleLogout = (): void => {
 
 <template>
   <header class="all-header">
-    <!-- 開啟新增房間 Modal 的貓掌按鈕 -->
+    <!--☆ 貓掌按鈕：點擊開啟新增房間 Modal ☆-->
     <div class="sell-btn">
       <img
         src="/image/cats-handv2.png"
@@ -31,9 +31,9 @@ const handleLogout = (): void => {
       />
     </div>
 
-    <!-- 導覽列 -->
+    <!--☆=== 導覽列 ===☆-->
     <ul class="navbar">
-      <!-- 已登入：顯示頭像與暱稱 -->
+      <!--☆ 已登入 ( ^ω^ ) -->
       <template v-if="isLoggedIn">
         <li class="login">
           <NuxtLink to="/mypage/info" class="myname">
@@ -50,7 +50,7 @@ const handleLogout = (): void => {
         </li>
       </template>
 
-      <!-- 未登入：顯示登入連結 -->
+      <!--☆ 未登入 (´・ω・｀) -->
       <template v-else>
         <li class="logout">
           <NuxtLink to="/login">登入</NuxtLink>
@@ -64,7 +64,7 @@ const handleLogout = (): void => {
 </template>
 
 <style lang="scss" scoped>
-//☆…☆…☆…☆…☆…☆…☆…☆…☆…☆ STYLE ☆…☆…☆…☆…☆…☆…☆…☆…☆…☆
+//☆…☆…☆…☆…☆…☆…☆…☆…☆ SCSS ☆…☆…☆…☆…☆…☆…☆…☆…☆
 .all-header {
   position: relative;
   max-width: 100%;

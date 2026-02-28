@@ -1,21 +1,22 @@
 import * as signalR from '@microsoft/signalr'
 
-// =============================================
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
 // useSignalR — SignalR 連線封裝
-// 在元件中使用，於 onUnmounted 時自動斷線
-// =============================================
+// 元件卸載時自動斷線，不用擔心記憶體洩漏 ★
+//☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆.｡.:*・ﾟ ☆
 
 export const useSignalR = () => {
   const config = useRuntimeConfig()
 
   let connection: signalR.HubConnection | null = null
 
+  // ☆ 目前的連線心跳
   /** 連線狀態 */
   const isConnected = ref(false)
 
   /**
-   * 建立並啟動 SignalR 連線
-   * @param token 使用者 JWT token（用於 Hub 驗證）
+   * ☆ 建立並啟動 SignalR 連線
+   * @param token 使用者 JWT token（Hub 驗證用）
    */
   const connect = async (token: string): Promise<void> => {
     if (connection) return
@@ -28,11 +29,13 @@ export const useSignalR = () => {
       .configureLogging(signalR.LogLevel.Warning)
       .build()
 
+    // ☆ 斷線的時候...(´・ω・｀)
     connection.onclose(() => {
       isConnected.value = false
       console.warn('SignalR 連線已關閉')
     })
 
+    // ☆ 重新連上了！ヽ(✿ﾟ▽ﾟ)ノ
     connection.onreconnected(() => {
       isConnected.value = true
       console.log('SignalR 重新連線成功')
@@ -48,9 +51,7 @@ export const useSignalR = () => {
     }
   }
 
-  /**
-   * 斷開 SignalR 連線
-   */
+  /** ☆ 斷開 SignalR 連線，掰掰 (´・ω・｀) */
   const disconnect = async (): Promise<void> => {
     if (!connection) return
     try {
@@ -66,25 +67,22 @@ export const useSignalR = () => {
   }
 
   /**
-   * 監聽 Hub 事件（支援單參數與多參數 callback）
+   * ☆ 監聽 Hub 事件
    * @param event 事件名稱
-   * @param callback 收到訊息時的回呼，參數數量依 Hub 事件而定
+   * @param callback 收到訊息時的回呼
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const on = (event: string, callback: (...args: any[]) => void): void => {
     connection?.on(event, callback)
   }
 
-  /**
-   * 移除 Hub 事件監聽
-   * @param event 事件名稱
-   */
+  /** ☆ 移除 Hub 事件監聽 */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const off = (event: string): void => {
     connection?.off(event)
   }
 
   /**
-   * 呼叫 Hub 方法（傳送訊息）
+   * ☆ 呼叫 Hub 方法（傳送訊息）
    * @param method Hub 方法名稱
    * @param args 傳入參數
    */
@@ -101,7 +99,7 @@ export const useSignalR = () => {
     }
   }
 
-  // 元件卸載時自動斷線，避免記憶體洩漏
+  // ☆ 元件卸載時自動斷線，不用手動清理 (´ω｀)
   onUnmounted(async () => {
     await disconnect()
   })
