@@ -1,0 +1,77 @@
+# =============================================
+# deploy.yml — GitHub Pages 自動部署
+# ☆.｡.:*・ﾟ push 到 main 就自動上線 ☆.｡.:*・ﾟ
+#
+# 流程：
+#   1. 安裝依賴
+#   2. nuxt generate → 輸出靜態檔到 .output/public/
+#   3. 上傳至 GitHub Pages
+# =============================================
+
+name: ☆ 部署至 GitHub Pages
+
+on:
+  # ☆ push 到 main branch 時觸發
+  push:
+    branches: [main]
+  # ☆ 也可以手動從 Actions 頁面觸發
+  workflow_dispatch:
+
+# 設定 GITHUB_TOKEN 的部署權限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一時間只允許一個部署，且不取消進行中的部署
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  #☆.｡.:*・ﾟ ── Build ── ☆.｡.:*・ﾟ
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ☆ 取得原始碼
+        uses: actions/checkout@v4
+
+      - name: ☆ 設定 Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: ☆ 設定 GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: ☆ 安裝依賴
+        run: npm ci
+
+      # ☆ NUXT_APP_BASE_URL 自動填入 repo 名稱
+      #   例：repo = Miubuy-Nuxt → baseURL = /Miubuy-Nuxt/
+      - name: ☆ 靜態建置 (nuxt generate)
+        run: npm run generate
+        env:
+          NUXT_APP_BASE_URL: /${{ github.event.repository.name }}/
+
+      # ☆ GitHub Pages 不處理 Jekyll，需加 .nojekyll 避免底線開頭的資料夾被忽略
+      - name: ☆ 加入 .nojekyll
+        run: touch .output/public/.nojekyll
+
+      - name: ☆ 上傳靜態檔
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .output/public
+
+  #☆.｡.:*・ﾟ ── Deploy ── ☆.｡.:*・ﾟ
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: ☆ 部署至 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

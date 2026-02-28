@@ -25,7 +25,8 @@ export default defineNuxtConfig({
         scss: {
           // 自動注入色彩變數，所有 <style lang="scss"> 可直接使用
           additionalData: '@use "~/assets/scss/variables" as *;',
-          silenceDeprecations: ['color-functions', 'global-builtin', 'import'], // 關閉 SCSS 相關警告
+          // 關閉 SCSS 相關警告
+          silenceDeprecations: ['color-functions', 'global-builtin', 'import'],
         },
       },
     },
@@ -57,7 +58,9 @@ export default defineNuxtConfig({
   },
 
   // ── App head ─────────────────────────────────
+  // ☆ baseURL：本機開發為 /，GitHub Pages 部署時由 Actions 注入 repo 名稱
   app: {
+    baseURL: process.env.NUXT_APP_BASE_URL ?? '/',
     head: {
       title: 'miubuy — 台日即時代購平台',
       meta: [
