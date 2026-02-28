@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Country, County, City, RoomTag } from '~/types'
+import type { Country, County, City, RoomTag } from '~/types';
 
 // =============================================
 // CreateRoomModal — 新增代購房間 Modal
@@ -9,130 +9,129 @@ import type { Country, County, City, RoomTag } from '~/types'
 
 const props = defineProps<{
   /** 控制 Modal 是否顯示 */
-  visible: boolean
-}>()
+  visible: boolean;
+}>();
 
 const emit = defineEmits<{
-  'update:visible': [value: boolean]
+  'update:visible': [value: boolean];
   /** 建立成功後傳回新房間 ID */
-  created: [roomId: number]
-}>()
+  created: [roomId: number];
+}>();
 
-const config    = useRuntimeConfig()
-const { token } = useAuth()
-const { uploadImage, isUploading } = useUpload()
-const router    = useRouter()
+const config = useRuntimeConfig();
+const { token } = useAuth();
+const { uploadImage, isUploading } = useUpload();
+const router = useRouter();
 
 // ── 表單資料 ─────────────────────────────────
 const roomInfo = reactive({
-  MaxUsers:  1,
-  Name:      '',
-  Picture:   '' as string,
+  MaxUsers: 1,
+  Name: '',
+  Picture: '' as string,
   CountryId: '' as number | '',
-  CountyId:  '' as number | '',
-  CityId:    '' as number | '',
-  TagId:     '' as number | '',
-  Rule:      '',
-  R18:       false,
-})
+  CountyId: '' as number | '',
+  CityId: '' as number | '',
+  TagId: '' as number | '',
+  Rule: '',
+  R18: false,
+});
 
 // ── 地區選單資料 ──────────────────────────────
-const countries = ref<Country[]>([])
-const counties  = ref<County[]>([])
-const cities    = ref<City[]>([])
-const tags      = ref<RoomTag[]>([])
+const countries = ref<Country[]>([]);
+const counties = ref<County[]>([]);
+const cities = ref<City[]>([]);
+const tags = ref<RoomTag[]>([]);
 
 // ── 圖片上傳 ─────────────────────────────────
-const fileInputRef = ref<HTMLInputElement | null>(null)
+const fileInputRef = ref<HTMLInputElement | null>(null);
 
 /** 觸發隱藏的 file input */
 const triggerFileInput = (): void => {
-  fileInputRef.value?.click()
-}
+  fileInputRef.value?.click();
+};
 
 /** 使用者選取圖片後上傳 */
 const handleFileChange = async (event: Event): Promise<void> => {
-  const input = event.target as HTMLInputElement
-  const file  = input.files?.[0]
-  if (!file) return
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
   try {
-    roomInfo.Picture = await uploadImage(file)
+    roomInfo.Picture = await uploadImage(file);
+  } catch {
+    console.error('招牌圖片上傳失敗');
   }
-  catch {
-    console.error('招牌圖片上傳失敗')
-  }
-}
+};
 
 // ── 串聯選單 ─────────────────────────────────
 /** 選擇國家後載入縣市 */
 const onCountryChange = async (): Promise<void> => {
-  if (!roomInfo.CountryId) return
+  if (!roomInfo.CountryId) return;
   try {
-    counties.value  = await $fetch<County[]>(`${config.public.apiBase}/api/Counties/${roomInfo.CountryId}`)
-    cities.value    = []
-    roomInfo.CountyId = ''
-    roomInfo.CityId   = ''
+    counties.value = await $fetch<County[]>(
+      `${config.public.apiBase}/api/Counties/${roomInfo.CountryId}`,
+    );
+    cities.value = [];
+    roomInfo.CountyId = '';
+    roomInfo.CityId = '';
+  } catch (err) {
+    console.error('取得縣市列表失敗', err);
   }
-  catch (err) {
-    console.error('取得縣市列表失敗', err)
-  }
-}
+};
 
 /** 選擇縣市後載入城市 */
 const onCountyChange = async (): Promise<void> => {
-  if (!roomInfo.CountyId) return
+  if (!roomInfo.CountyId) return;
   try {
-    cities.value    = await $fetch<City[]>(`${config.public.apiBase}/api/Cities/${roomInfo.CountyId}`)
-    roomInfo.CityId = ''
+    cities.value = await $fetch<City[]>(
+      `${config.public.apiBase}/api/Cities/${roomInfo.CountyId}`,
+    );
+    roomInfo.CityId = '';
+  } catch (err) {
+    console.error('取得城市列表失敗', err);
   }
-  catch (err) {
-    console.error('取得城市列表失敗', err)
-  }
-}
+};
 
 // ── 提交 ─────────────────────────────────────
-const isSubmitting = ref(false)
+const isSubmitting = ref(false);
 
 /** 送出建立房間請求 */
 const createRoom = async (): Promise<void> => {
   if (!roomInfo.Name || !roomInfo.CountryId || !roomInfo.TagId) {
-    console.warn('房名、地區、種類為必填')
-    return
+    console.warn('房名、地區、種類為必填');
+    return;
   }
 
-  isSubmitting.value = true
+  isSubmitting.value = true;
   try {
     const roomId = await $fetch<number>(`${config.public.apiBase}/api/Rooms`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token.value}` },
       body: {
-        MaxUsers:  roomInfo.MaxUsers,
-        Name:      roomInfo.Name,
-        Picture:   roomInfo.Picture,
+        MaxUsers: roomInfo.MaxUsers,
+        Name: roomInfo.Name,
+        Picture: roomInfo.Picture,
         CountryId: Number(roomInfo.CountryId),
-        CountyId:  Number(roomInfo.CountyId),
-        CityId:    Number(roomInfo.CityId),
-        TagId:     Number(roomInfo.TagId),
-        Rule:      roomInfo.Rule,
-        R18:       roomInfo.R18,
+        CountyId: Number(roomInfo.CountyId),
+        CityId: Number(roomInfo.CityId),
+        TagId: Number(roomInfo.TagId),
+        Rule: roomInfo.Rule,
+        R18: roomInfo.R18,
       },
-    })
-    emit('created', roomId)
-    closeModal()
-    router.push(`/chatroom/${roomId}`)
+    });
+    emit('created', roomId);
+    closeModal();
+    router.push(`/chatroom/${roomId}`);
+  } catch (err) {
+    console.error('建立房間失敗', err);
+  } finally {
+    isSubmitting.value = false;
   }
-  catch (err) {
-    console.error('建立房間失敗', err)
-  }
-  finally {
-    isSubmitting.value = false
-  }
-}
+};
 
 /** 關閉 Modal */
 const closeModal = (): void => {
-  emit('update:visible', false)
-}
+  emit('update:visible', false);
+};
 
 // ── 初始化資料 ────────────────────────────────
 onMounted(async () => {
@@ -140,14 +139,13 @@ onMounted(async () => {
     const [countryRes, tagRes] = await Promise.all([
       $fetch<Country[]>(`${config.public.apiBase}/api/Countries`),
       $fetch<RoomTag[]>(`${config.public.apiBase}/api/Tags`),
-    ])
-    countries.value = countryRes
-    tags.value      = tagRes
+    ]);
+    countries.value = countryRes;
+    tags.value = tagRes;
+  } catch (err) {
+    console.error('初始化房間表單資料失敗', err);
   }
-  catch (err) {
-    console.error('初始化房間表單資料失敗', err)
-  }
-})
+});
 </script>
 
 <template>
@@ -155,7 +153,6 @@ onMounted(async () => {
   <Teleport to="body">
     <div class="modale" :class="{ opened: visible }" aria-hidden="true">
       <div class="modal-dialog">
-
         <!-- Modal Header -->
         <div class="modal-header">
           <img src="/image/deco_cat-ribon.png" alt="" class="ribon001" />
@@ -169,7 +166,6 @@ onMounted(async () => {
         <!-- Modal Body -->
         <div class="modal-body">
           <div class="modal-body-l">
-
             <!-- 房名 -->
             <div class="room-name-group group-flex mb">
               <label>房名</label>
@@ -205,19 +201,31 @@ onMounted(async () => {
               <div class="location-selects">
                 <select v-model="roomInfo.CountryId" @change="onCountryChange">
                   <option value="" disabled>( ^ω^ )</option>
-                  <option v-for="country in countries" :key="country.Id" :value="country.Id">
+                  <option
+                    v-for="country in countries"
+                    :key="country.Id"
+                    :value="country.Id"
+                  >
                     {{ country.Name }}
                   </option>
                 </select>
                 <select v-model="roomInfo.CountyId" @change="onCountyChange">
                   <option value="">不選 ☆彡</option>
-                  <option v-for="county in counties" :key="county.Id" :value="county.Id">
+                  <option
+                    v-for="county in counties"
+                    :key="county.Id"
+                    :value="county.Id"
+                  >
                     {{ county.Name }}
                   </option>
                 </select>
                 <select v-model="roomInfo.CityId">
                   <option value="">不選 ☆彡</option>
-                  <option v-for="city in cities" :key="city.Id" :value="city.Id">
+                  <option
+                    v-for="city in cities"
+                    :key="city.Id"
+                    :value="city.Id"
+                  >
                     {{ city.Name }}
                   </option>
                 </select>
@@ -243,6 +251,12 @@ onMounted(async () => {
               </select>
             </div>
 
+            <!--
+              TODO ☆ 最低評價要求
+              Vue2 原版的 select 無綁定（v-model 缺失）且後端 API 目前無此欄位
+              確認 API 支援後補上 v-model="roomInfo.MinRating" 及選項值
+            -->
+
             <!-- R18 -->
             <ul class="access-checkgroup">
               <li class="r18-request">
@@ -262,7 +276,11 @@ onMounted(async () => {
         <!-- Modal Footer -->
         <div class="modal-footer group-flex">
           <button class="btn-action" @click="closeModal">取消</button>
-          <button class="btn-action btn-action--primary" :disabled="isSubmitting" @click="createRoom">
+          <button
+            class="btn-action btn-action--primary"
+            :disabled="isSubmitting"
+            @click="createRoom"
+          >
             {{ isSubmitting ? '建立中…' : '建立' }}
           </button>
         </div>
@@ -282,7 +300,9 @@ onMounted(async () => {
   z-index: 10;
 }
 
-.opened::before { display: block; }
+.opened::before {
+  display: block;
+}
 
 .opened .modal-dialog {
   transform: translateX(-20%);
@@ -307,7 +327,9 @@ onMounted(async () => {
 }
 
 // ── Header ────────────────────────────────────
-.modal-header { position: relative; }
+.modal-header {
+  position: relative;
+}
 
 .ribon001 {
   position: absolute;
@@ -369,7 +391,9 @@ onMounted(async () => {
   }
 }
 
-.modal-body-l { margin-right: 25px; }
+.modal-body-l {
+  margin-right: 25px;
+}
 
 .modal-body-r {
   margin-left: 25px;
@@ -382,10 +406,14 @@ onMounted(async () => {
     color: $color-brown;
     font-size: 18px;
 
-    &:focus { outline: none; }
+    &:focus {
+      outline: none;
+    }
   }
 
-  .rule-title { margin-bottom: 15px; }
+  .rule-title {
+    margin-bottom: 15px;
+  }
 }
 
 .group-flex {
@@ -393,7 +421,9 @@ onMounted(async () => {
   align-items: center;
 }
 
-.mb { margin-bottom: 14px; }
+.mb {
+  margin-bottom: 14px;
+}
 
 // ── 圖片上傳 ─────────────────────────────────
 .room-img-wrapper {
@@ -420,11 +450,19 @@ onMounted(async () => {
   }
 }
 
-.room-name { width: 70%; }
+.room-name {
+  width: 70%;
+}
 
-.location-selects { display: flex; flex-wrap: wrap; gap: 4px; }
+.location-selects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
 
-.hidden-file-input { display: none; }
+.hidden-file-input {
+  display: none;
+}
 
 // ── R18 ───────────────────────────────────────
 .r18-request {
@@ -459,12 +497,19 @@ onMounted(async () => {
   border-radius: 5px;
   cursor: pointer;
 
-  &:hover    { background-color: lighten($color-brown, 10%); }
-  &:disabled { opacity: 0.6; cursor: not-allowed; }
+  &:hover {
+    background-color: lighten($color-brown, 10%);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
   &--primary {
     background-color: darken($color-header, 10%);
-    &:hover { background-color: darken($color-header, 15%); }
+    &:hover {
+      background-color: darken($color-header, 15%);
+    }
   }
 }
 </style>

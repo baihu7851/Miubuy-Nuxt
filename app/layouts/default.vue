@@ -5,21 +5,21 @@
 // AppHeader 的貓掌按鈕 → emit openCreateRoom → layout 接收 → 開啟 Modal
 // =============================================
 
-const showCreateRoom = ref(false)
+const showCreateRoom = ref(false);
 
 /** 提供開啟 Modal 的函式給所有子元件使用 */
 provide('openCreateRoom', () => {
-  showCreateRoom.value = true
-})
+  showCreateRoom.value = true;
+});
 </script>
 
 <template>
   <!-- 預設版面：含 Header 和 Footer，用於主要頁面 -->
   <div class="homepage-max-width">
-    <AppHeader @open-create-room="showCreateRoom = true" />
+    <LayoutAppHeader @open-create-room="showCreateRoom = true" />
     <slot />
-    <AppFooter />
-    <CreateRoomModal v-model:visible="showCreateRoom" />
+    <LayoutAppFooter />
+    <ModalCreateRoomModal v-model:visible="showCreateRoom" />
   </div>
 </template>
 

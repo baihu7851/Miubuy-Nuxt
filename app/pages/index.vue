@@ -4,47 +4,48 @@
 // 顯示日台地圖與在線代購房間數
 // =============================================
 
-const config = useRuntimeConfig()
+const config = useRuntimeConfig();
 
 // ── 在線房間數 ────────────────────────────────
-const japanCount  = ref<number | string>('…')
-const taiwanCount = ref<number | string>('…')
-const isLoading   = ref(true)
+const japanCount = ref<number | string>('…');
+const taiwanCount = ref<number | string>('…');
+const isLoading = ref(true);
 
 interface CountryWithCount {
-  Id: number
-  Name: string
-  Count: number
+  Id: number;
+  Name: string;
+  Count: number;
 }
 
 onMounted(async () => {
   // 延遲 1.5 秒後隱藏 Loading（同原本邏輯）
   setTimeout(() => {
-    isLoading.value = false
-  }, 1500)
+    isLoading.value = false;
+  }, 1500);
 
   try {
-    const data = await $fetch<CountryWithCount[]>(`${config.public.apiBase}/api/Countries`)
+    const data = await $fetch<CountryWithCount[]>(
+      `${config.public.apiBase}/api/Countries`,
+    );
     // Id=2 為日本，Id=3 為台灣（依原本 API 順序）
-    const japan  = data.find(c => c.Id === 2)
-    const taiwan = data.find(c => c.Id === 3)
-    japanCount.value  = japan?.Count  ?? 0
-    taiwanCount.value = taiwan?.Count ?? 0
+    const japan = data.find((c) => c.Id === 2);
+    const taiwan = data.find((c) => c.Id === 3);
+    japanCount.value = japan?.Count ?? 0;
+    taiwanCount.value = taiwan?.Count ?? 0;
+  } catch (err) {
+    console.error('取得在線房間數失敗', err);
   }
-  catch (err) {
-    console.error('取得在線房間數失敗', err)
-  }
-})
+});
 
-// ── 新增房間 Modal ────────────────────────────
-const showCreateRoom = ref(false)
+// ☆.｡.:*・ﾟ 新增房間 Modal 由 default layout 的貓掌按鈕統一控制 ☆
+// AppHeader emit('openCreateRoom') → default.vue 接收 → 開啟 Modal
+// 此頁不需要自行宣告，避免產生兩個互不相通的 Modal 實例
 </script>
 
 <template>
   <!-- 首頁：日台地圖 + 在線代購房間數 -->
   <div class="body">
     <div class="home-container">
-
       <!-- Logo 區 -->
       <div class="logo-block">
         <img src="/image/logo.png" alt="miubuy" class="logo" />
@@ -53,11 +54,14 @@ const showCreateRoom = ref(false)
 
       <!-- 地圖區 -->
       <div class="map">
-
         <!-- 日本地圖 -->
         <div class="ja-map">
           <NuxtLink to="/area/japan">
-            <img src="/image/JAPAN_MAP/new_nekomap.png" alt="日本地圖" class="ja-map-img" />
+            <img
+              src="/image/JAPAN_MAP/new_nekomap.png"
+              alt="日本地圖"
+              class="ja-map-img"
+            />
           </NuxtLink>
           <h3 class="ja-online-status">
             <img src="/image/cat_hand_icon.png" alt="" class="icon" />
@@ -69,7 +73,11 @@ const showCreateRoom = ref(false)
         <!-- 台灣地圖 -->
         <div class="tw-map">
           <NuxtLink to="/area/taiwan">
-            <img src="/image/TW_MAP/new_taiwan_map.png" alt="台灣地圖" class="tw-map-img" />
+            <img
+              src="/image/TW_MAP/new_taiwan_map.png"
+              alt="台灣地圖"
+              class="tw-map-img"
+            />
           </NuxtLink>
           <h3 class="tw-online-status">
             <img src="/image/cat_hand_icon.png" alt="" class="icon" />
@@ -80,16 +88,10 @@ const showCreateRoom = ref(false)
       </div>
     </div>
 
-    <!-- 新增房間 Modal（透過 Header 貓掌按鈕觸發） -->
-    <CreateRoomModal v-model:visible="showCreateRoom" />
-
-    <!-- Loading 動畫 -->
+    <!-- ☆.｡.:*・ﾟ Loading 動畫 ☆.｡.:*・ﾟ -->
     <LoadingSpinner v-if="isLoading" />
   </div>
 </template>
-
-<!-- ── Header 事件橋接：監聽 AppHeader 的 openCreateRoom ── -->
-<!-- 因為 AppHeader 在 layout 層，透過 provide/inject 傳遞開啟函式 -->
 
 <style lang="scss">
 /* 首頁 body 背景 */
@@ -119,7 +121,9 @@ body {
   flex-direction: column;
 }
 
-.logo { width: 240px; }
+.logo {
+  width: 240px;
+}
 
 .subtitle {
   font-family: myfont, serif;
@@ -145,13 +149,19 @@ body {
 .ja-map {
   margin-right: 10px;
   cursor: pointer;
-  &:hover { transform: translateY(2px); transition: all 0.5s; }
+  &:hover {
+    transform: translateY(2px);
+    transition: all 0.5s;
+  }
 }
 
 .tw-map {
   margin-left: 10px;
   cursor: pointer;
-  &:hover { transform: translateY(2px); transition: all 0.5s; }
+  &:hover {
+    transform: translateY(2px);
+    transition: all 0.5s;
+  }
 }
 
 .ja-online-status,
