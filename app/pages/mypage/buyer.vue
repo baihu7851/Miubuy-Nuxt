@@ -143,7 +143,7 @@ const onRefreshed = async () => {
       <li class="nodetail"><img src="/image/dodetail-buy.png" alt="" /></li>
     </ul>
 
-    <ModalBuyerOrderModal
+    <ModalBuyerOrder
       v-model:visible="showModal"
       :order-data="selectedOrder"
       :status="selectedStatus"

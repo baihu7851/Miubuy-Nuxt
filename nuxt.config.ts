@@ -18,8 +18,12 @@ export default defineNuxtConfig({
     '~/assets/scss/reset.scss',
   ],
 
-  // ── Vite SCSS 設定 ────────────────────────────
+  // ── Vite 設定 ─────────────────────────────────
   vite: {
+    // signalr-asp-net 是 CommonJS 模組，需明確列入預編譯
+    optimizeDeps: {
+      include: ['signalr-asp-net'],
+    },
     css: {
       preprocessorOptions: {
         scss: {
@@ -37,7 +41,10 @@ export default defineNuxtConfig({
     public: {
       /** REST API 基礎網址，例如 https://miubuy.rocket-coding.com */
       apiBase: process.env.NUXT_PUBLIC_API_BASE ?? 'https://miubuy.rocket-coding.com',
-      /** SignalR Hub 完整 URL，例如 https://miubuy.rocket-coding.com/signalr */
+      /**
+       * SignalR Hub URL（含 /signalr 路徑，與 Vue2 原版一致）
+       * TODO（升級時）：確認 Core 版 Hub 路徑是否相同
+       */
       signalrHub: process.env.NUXT_PUBLIC_SIGNALR_HUB ?? 'https://miubuy.rocket-coding.com/signalr',
       /** 圖片上傳 API URL */
       uploadUrl: process.env.NUXT_PUBLIC_UPLOAD_URL ?? 'https://miubuy.rocket-coding.com/api/UpLoadFile',

@@ -85,9 +85,8 @@ export interface RoomInfo {
 /** 訂單明細項目 */
 export interface OrderItem {
   Id: number
-  Title: string
+  Name: string
   Price: number
-  Checked: boolean
 }
 
 /** 結帳收件人資料 */

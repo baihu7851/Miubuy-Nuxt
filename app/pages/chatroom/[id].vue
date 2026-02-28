@@ -54,7 +54,7 @@ const total = computed(() =>
 // 新增商品 UI
 const showAddInput = ref(false);
 const newItemTitle = ref('');
-const newItemPrice = ref('');
+const newItemPrice = ref<number | null>(null);
 
 //☆=========== 訂單流程狀態 ===========☆
 const canBuyerConfirm = ref(true); // 買家可以按「確認訂單」
@@ -77,6 +77,12 @@ onMounted(async () => {
 
   await fetchRoomInfo();
   await signalR.connect(token.value);
+  console.log(
+    '[onMounted] SignalR 連線完成，本機 userId:',
+    userId.value,
+    '| hostId:',
+    hostId.value,
+  );
   setupSignalREvents();
   await signalR.invoke('JoinRoom', userId.value, roomId.value);
 });
@@ -90,6 +96,7 @@ const fetchRoomInfo = async (): Promise<void> => {
     roomInfo.value = data;
     hostId.value =
       (data as unknown as { Seller: Array<{ Id: number }> }).Seller[0]?.Id ?? 0;
+    console.log('[fetchRoomInfo] hostId 設為:', hostId.value);
   } catch (err) {
     console.error('取得房間資料失敗', err);
   }
@@ -99,8 +106,27 @@ const fetchRoomInfo = async (): Promise<void> => {
 const setupSignalREvents = (): void => {
   // 有人進入房間
   signalR.on<number>('joinRoom', (incomingUserId, incomingRoomId) => {
-    if (Number(incomingUserId) === hostId.value) return;
+    console.log(
+      '[joinRoom] incomingUserId:',
+      incomingUserId,
+      '| incomingRoomId:',
+      incomingRoomId,
+    );
+    console.log(
+      '[joinRoom] 本機 userId:',
+      userId.value,
+      '| hostId:',
+      hostId.value,
+    );
+    if (Number(incomingUserId) === hostId.value) {
+      console.log('[joinRoom] 進入者是賣家，略過');
+      return;
+    }
 
+    console.log(
+      '[joinRoom] 進入者是買家，buyerId 設為:',
+      Number(incomingUserId),
+    );
     buyerId.value = Number(incomingUserId);
     buyerInRoom.value += 1;
 
@@ -115,12 +141,32 @@ const setupSignalREvents = (): void => {
 
   // 歷史訊息
   signalR.on<ChatMessage[]>('messageHistory', (history) => {
+    console.log('[messageHistory] 收到歷史訊息，筆數:', history.length);
+    history.forEach((msg, i) => {
+      console.log(
+        `[messageHistory][${i}] SenderId: ${msg.SenderId} | Message: ${msg.Message} | MsgTime: ${msg.MsgTime}`,
+      );
+    });
     chatHistory.value = history;
     scrollToBottom();
   });
 
   // 即時訊息
   signalR.on<ChatMessage>('message', (msg) => {
+    console.log(
+      '[message] 收到即時訊息 | SenderId:',
+      msg.SenderId,
+      '| Message:',
+      msg.Message,
+      '| MsgTime:',
+      msg.MsgTime,
+    );
+    console.log(
+      '[message] 本機 userId:',
+      userId.value,
+      '| 是否為自己發送:',
+      msg.SenderId === userId.value,
+    );
     chatHistory.value.push(msg);
     scrollToBottom();
   });
@@ -133,18 +179,43 @@ const setupSignalREvents = (): void => {
   // 取得房間用戶資料（頭像、訂單狀態）
   signalR.on<{
     Id: number;
+    SellerId: number;
     Picture: string;
     SellerPicture: string;
     Status: string;
     OrderId: number;
   }>('getRoomUsers', (res) => {
-    if (userId.value === res.Id) {
+    console.log('[getRoomUsers] res 完整內容:', JSON.stringify(res));
+    console.log(
+      '[getRoomUsers] 本機 userId:',
+      userId.value,
+      '| res.SellerId:',
+      res.SellerId,
+    );
+    // ☆ res.SellerId で賣家を判断する (´ω｀)
+    if (userId.value === res.SellerId) {
+      console.log('[getRoomUsers] 判斷：我是賣家');
+      // ☆ 我是賣家
       myPhoto.value = res.SellerPicture;
       otherPhoto.value = res.Picture;
     } else {
-      otherPhoto.value = res.Picture;
-      myPhoto.value = res.SellerPicture;
+      console.log('[getRoomUsers] 判斷：我是買家');
+      // ☆ 我是買家
+      myPhoto.value = res.Picture;
+      otherPhoto.value = res.SellerPicture;
     }
+    console.log(
+      '[getRoomUsers] myPhoto:',
+      myPhoto.value,
+      '| otherPhoto:',
+      otherPhoto.value,
+    );
+    console.log(
+      '[getRoomUsers] Status:',
+      res.Status,
+      '| OrderId:',
+      res.OrderId,
+    );
 
     if (res.Status === '訂單確認') {
       canSellerConfirm.value = true;
@@ -198,14 +269,18 @@ const sendMessage = async (): Promise<void> => {
 /** 新增商品（賣家） */
 const addOrderItem = async (): Promise<void> => {
   const title = newItemTitle.value.trim();
-  const price = newItemPrice.value.trim();
-  if (!title || !price) return;
+  const price = newItemPrice.value;
+  if (
+    !title ||
+    price === null ||
+    price === undefined ||
+    price === ('' as unknown)
+  )
+    return;
 
   orderItems.value.push({
-    Id: 0,
-    Title: title,
+    Name: title,
     Price: Number(price),
-    Checked: false,
   });
   await signalR.invoke(
     'NewDetail',
@@ -215,7 +290,7 @@ const addOrderItem = async (): Promise<void> => {
   );
 
   newItemTitle.value = '';
-  newItemPrice.value = '';
+  newItemPrice.value = null;
   showAddInput.value = false;
 };
 
@@ -255,8 +330,8 @@ const sellerConfirmOrder = async (): Promise<void> => {
 };
 
 /** 買家結帳：跳轉並通知賣家 */
-const goCheckout = async (): Promise<void> => {
-  await signalR.invoke('Chked', roomId.value);
+const goCheckout = (): void => {
+  signalR.invoke('Chked', roomId.value);
   router.push(`/checkout/${orderId.value}`);
 };
 
@@ -432,7 +507,7 @@ const onRoomUpdated = async (): Promise<void> => {
           <ul v-if="!isSeller">
             <li v-for="item in orderItems" :key="item.Id" class="order text">
               <h3>
-                <span class="product-name">{{ item.Title }}</span>
+                <span class="product-name">{{ item.Name }}</span>
               </h3>
               <p>
                 $ <span class="price">{{ item.Price }}</span>
@@ -449,7 +524,7 @@ const onRoomUpdated = async (): Promise<void> => {
                   class="remove-icon"
                   @click="removeOrderItem(item)"
                 />
-                <span class="product-name">{{ item.Title }}</span>
+                <span class="product-name">{{ item.Name }}</span>
               </h3>
               <p>
                 $ <span class="price">{{ item.Price }}</span>
@@ -539,10 +614,10 @@ const onRoomUpdated = async (): Promise<void> => {
     </div>
 
     <!-- Loading -->
-    <LoadingSpinner v-if="isLoading" />
+    <CommonLoadingSpinner v-if="isLoading" />
 
     <!-- 編輯房間 Modal -->
-    <EditRoomModal
+    <ModalEditRoom
       v-if="roomInfo"
       v-model:visible="showEditRoom"
       :room-data="roomInfo"

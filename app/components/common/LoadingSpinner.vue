@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // =============================================
 // LoadingSpinner — 全站通用載入動畫
-// 使用方式：<LoadingSpinner v-if="isLoading" />
+// 使用方式：<CommonLoadingSpinner v-if="isLoading" />
 // =============================================
 </script>
 

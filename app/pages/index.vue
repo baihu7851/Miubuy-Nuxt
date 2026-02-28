@@ -38,7 +38,7 @@ onMounted(async () => {
 });
 
 // ☆.｡.:*・ﾟ 新增房間 Modal 由 default layout 的貓掌按鈕統一控制 ☆
-// AppHeader emit('openCreateRoom') → default.vue 接收 → 開啟 Modal
+// LayoutHeader emit('openCreateRoom') → default.vue 接收 → 開啟 Modal
 // 此頁不需要自行宣告，避免產生兩個互不相通的 Modal 實例
 </script>
 
@@ -89,7 +89,7 @@ onMounted(async () => {
     </div>
 
     <!-- ☆.｡.:*・ﾟ Loading 動畫 ☆.｡.:*・ﾟ -->
-    <LoadingSpinner v-if="isLoading" />
+    <CommonLoadingSpinner v-if="isLoading" />
   </div>
 </template>
 

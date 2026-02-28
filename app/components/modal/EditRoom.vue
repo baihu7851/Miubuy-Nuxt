@@ -2,7 +2,7 @@
 import type { RoomInfo, Country, County, City, RoomTag } from '~/types';
 
 // =============================================
-// EditRoomModal — 編輯代購房間 Modal
+// EditRoom — 編輯代購房間 Modal
 // 接收目前房間資料作為初始值，送出 PUT 更新
 // =============================================
 

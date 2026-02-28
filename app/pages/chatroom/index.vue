@@ -343,7 +343,7 @@ const enterRoom = async (roomId: number): Promise<void> => {
       />
     </div>
 
-    <LoadingSpinner v-if="isLoading" />
+    <CommonLoadingSpinner v-if="isLoading" />
   </div>
 </template>
 

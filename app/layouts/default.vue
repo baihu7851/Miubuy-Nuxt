@@ -2,7 +2,7 @@
 // =============================================
 // default.vue — 預設版面
 // 透過 provide 讓子頁面可以呼叫開啟 CreateRoomModal
-// AppHeader 的貓掌按鈕 → emit openCreateRoom → layout 接收 → 開啟 Modal
+// LayoutHeader 的貓掌按鈕 → emit openCreateRoom → layout 接收 → 開啟 Modal
 // =============================================
 
 const showCreateRoom = ref(false);
@@ -16,10 +16,10 @@ provide('openCreateRoom', () => {
 <template>
   <!-- 預設版面：含 Header 和 Footer，用於主要頁面 -->
   <div class="homepage-max-width">
-    <LayoutAppHeader @open-create-room="showCreateRoom = true" />
+    <LayoutHeader @open-create-room="showCreateRoom = true" />
     <slot />
-    <LayoutAppFooter />
-    <ModalCreateRoomModal v-model:visible="showCreateRoom" />
+    <LayoutFooter />
+    <ModalCreateRoom v-model:visible="showCreateRoom" />
   </div>
 </template>
 

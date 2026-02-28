@@ -175,7 +175,7 @@ const putOrder = async (): Promise<void> => {
       </div>
     </div>
 
-    <LoadingSpinner v-if="isLoading" />
+    <CommonLoadingSpinner v-if="isLoading" />
   </div>
 </template>
 
